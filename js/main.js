@@ -28,7 +28,7 @@ const checkStringLength = (str, maxLength) => {
     throw new Error('str must be a string');
   }
   // проверка что передаётся число
-  if (typeof maxLength !== 'number') {
+  if (typeof maxLength !== 'number' || Number.isNaN(maxLength)) {
     throw new Error('max length must be a number');
   }
 
@@ -36,4 +36,4 @@ const checkStringLength = (str, maxLength) => {
 };
 
 getRandomInteger(1, 23);
-checkStringLength('abc', 10);
+checkStringLength('abc');
