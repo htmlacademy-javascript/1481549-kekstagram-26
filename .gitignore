@@ -9,4 +9,5 @@ build/
 node_modules/
 npm-debug.log*
 Thumbs.db
+.prettierrc.json
 .vscode/
