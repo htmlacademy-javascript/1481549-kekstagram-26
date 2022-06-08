@@ -32,7 +32,7 @@ const checkStringLength = (str, maxLength) => {
     throw new Error('max length must be a number');
   }
 
-  return str.length > maxLength;
+  return str.length <= maxLength;
 };
 
 getRandomInteger(1, 23);
