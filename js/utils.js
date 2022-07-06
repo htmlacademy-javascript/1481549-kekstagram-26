@@ -35,4 +35,7 @@ const checkStringLength = (str, maxLength) => {
   return str.length <= maxLength;
 };
 
-export { getRandomInteger, checkStringLength };
+const isEscapeKey = (event) => event.key === 'Escape';
+const isTabKey = (event) => event.key === 'Tab';
+
+export { getRandomInteger, checkStringLength, isEscapeKey, isTabKey };

@@ -1,13 +1,15 @@
+import { isEscapeKey, isTabKey } from './utils.js';
+
 const body = document.body;
 const bigPicture = document.querySelector('.big-picture');
 const imageElement = bigPicture.querySelector('.big-picture__img img');
 const likesCountElement = bigPicture.querySelector('.likes-count');
 const captionElement = bigPicture.querySelector('.social__caption');
-const currentCommentsCountElement = bigPicture.querySelector(
-  '.social__comment-count'
-);
+// const currentCommentsCountElement = bigPicture.querySelector(
+//   '.social__comment-count'
+// );
 const allCommentsCountElement = bigPicture.querySelector('.comments-count');
-const commentsLoader = bigPicture.querySelector('.comments-loader');
+//const commentsLoader = bigPicture.querySelector('.comments-loader');
 const commentsElement = bigPicture.querySelector('.social__comments');
 const closeButton = bigPicture.querySelector('#picture-cancel');
 
@@ -37,8 +39,6 @@ const createGallery = ({ url, likes, comments, description }) => {
   likesCountElement.textContent = likes;
   allCommentsCountElement.textContent = comments.length;
   captionElement.textContent = description;
-  currentCommentsCountElement.classList.add('hidden');
-  commentsLoader.classList.add('hidden');
 
   commentsElement.innerHTML = '';
   const commentsFragment = document.createDocumentFragment();
@@ -49,24 +49,55 @@ const createGallery = ({ url, likes, comments, description }) => {
   commentsElement.append(commentsFragment);
 };
 
-const showGallery = () => {
-  bigPicture.classList.remove('hidden');
-  body.classList.add('modal-open');
+const focusableElements = bigPicture.querySelectorAll(
+  'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'
+);
+const firstFocusableElement = focusableElements[0];
+const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+const focusHandler = (event) => {
+  if (!isTabKey(event)) {
+    return;
+  }
+
+  if (event.shiftKey) {
+    if (document.activeElement === firstFocusableElement) {
+      lastFocusableElement.focus();
+      event.preventDefault();
+    }
+  } else {
+    if (document.activeElement === lastFocusableElement) {
+      event.preventDefault();
+      firstFocusableElement.focus();
+    }
+  }
 };
 
 const closeGallery = () => {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
+  bigPicture.removeEventListener('keydown', (event) => focusHandler(event));
+  document.removeEventListener('keydown', (event) => escapeHandler(event));
+};
+
+function escapeHandler(event) {
+  if (isEscapeKey(event)) {
+    event.preventDefault();
+    closeGallery();
+  }
+}
+
+const showGallery = () => {
+  bigPicture.classList.remove('hidden');
+  body.classList.add('modal-open');
+  bigPicture.addEventListener('keydown', (event) => focusHandler(event));
+  closeButton.focus();
+
+  document.addEventListener('keydown', (event) => escapeHandler(event));
 };
 
 closeButton.addEventListener('click', () => {
   closeGallery();
-});
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') {
-    closeGallery();
-  }
 });
 
 export { createGallery, showGallery };
