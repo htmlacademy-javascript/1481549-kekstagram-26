@@ -1,4 +1,4 @@
-import { isEscapeKey, isTabKey } from './utils.js';
+import { isEscapeKey, isTabKey, trapFocus } from './utils.js';
 
 const body = document.body;
 const bigPicture = document.querySelector('.big-picture');
@@ -49,35 +49,13 @@ const createGallery = ({ url, likes, comments, description }) => {
   commentsElement.append(commentsFragment);
 };
 
-const focusableElements = bigPicture.querySelectorAll(
-  'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'
-);
-const firstFocusableElement = focusableElements[0];
-const lastFocusableElement = focusableElements[focusableElements.length - 1];
-
-const focusHandler = (event) => {
-  if (!isTabKey(event)) {
-    return;
-  }
-
-  if (event.shiftKey) {
-    if (document.activeElement === firstFocusableElement) {
-      lastFocusableElement.focus();
-      event.preventDefault();
-    }
-  } else {
-    if (document.activeElement === lastFocusableElement) {
-      event.preventDefault();
-      firstFocusableElement.focus();
-    }
-  }
-};
+const focusHandler = trapFocus(bigPicture);
 
 const closeGallery = () => {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
-  bigPicture.removeEventListener('keydown', (event) => focusHandler(event));
-  document.removeEventListener('keydown', (event) => escapeHandler(event));
+  bigPicture.removeEventListener('keydown', focusHandler);
+  document.removeEventListener('keydown', escapeHandler);
 };
 
 function escapeHandler(event) {
@@ -90,10 +68,10 @@ function escapeHandler(event) {
 const showGallery = () => {
   bigPicture.classList.remove('hidden');
   body.classList.add('modal-open');
-  bigPicture.addEventListener('keydown', (event) => focusHandler(event));
+  bigPicture.addEventListener('keydown', focusHandler);
   closeButton.focus();
 
-  document.addEventListener('keydown', (event) => escapeHandler(event));
+  document.addEventListener('keydown', escapeHandler);
 };
 
 closeButton.addEventListener('click', () => {
