@@ -18,14 +18,14 @@ pristine.addValidator(
 pristine.addValidator(
   hashTagInput,
   (value) => {
-    if(value.length === 0 ) {
+    if (value.length === 0) {
       return true;
     }
-    const hashTags = value.split(' ');
+    const hashTags = value.trim().split(/\s+/);
     const re = /^#[A-Za-zА-Яа-яЁё0-9]{1,19}$/;
     return hashTags.every((hashTag) => re.test(hashTag));
   },
-  'Хэштег должен начинаться с # и не содержать пробелов',
+  'Хэштег должен начинаться с #, не содержать пробелов и быть длиной максимум 20 символов',
   2,
   false
 );
@@ -33,13 +33,33 @@ pristine.addValidator(
 pristine.addValidator(
   hashTagInput,
   (value) => {
-    if(value.length === 0 ) {
+    if (value.length === 0) {
       return true;
     }
-    const hashTags = value.split(' ');
-    return hashTags.filter((hashTag, index) => hashTags.indexOf(hashTag) !== index).length === 0;
+    const hashTags = value
+      .trim()
+      .split(/\s+/)
+      .map((hashTag) => hashTag.toLowerCase());
+    return (
+      hashTags.filter((hashTag, index) => hashTags.indexOf(hashTag) !== index)
+        .length === 0
+    );
   },
   'Хэштеги не должны повторяться',
+  2,
+  false
+);
+
+pristine.addValidator(
+  hashTagInput,
+  (value) => {
+    if (value.length === 0) {
+      return true;
+    }
+    const hashTags = value.trim().split(/\s+/);
+    return hashTags.length <= 5;
+  },
+  'Нельзя указать больше 5 хэштегов',
   2,
   false
 );
@@ -51,14 +71,15 @@ const validate = () => {
     return [true, ''];
   } else {
     const inputs = pristine.getErrors();
-    const errorMessage = inputs.reduce((acc, input) => {
-      const errorForInput = input.errors.join(', ');
-      acc += `${errorForInput}, `;
-      return acc;
-    }, '').slice(0, -2);
+    const errorMessage = inputs
+      .reduce((acc, input) => {
+        const errorForInput = input.errors.join(', ');
+        acc += `${errorForInput}, `;
+        return acc;
+      }, '')
+      .slice(0, -2);
     return [false, errorMessage];
   }
 };
 
 export { validate };
-
