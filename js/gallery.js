@@ -1,13 +1,15 @@
+import { isEscapeKey, isTabKey, trapFocus } from './utils.js';
+
 const body = document.body;
 const bigPicture = document.querySelector('.big-picture');
 const imageElement = bigPicture.querySelector('.big-picture__img img');
 const likesCountElement = bigPicture.querySelector('.likes-count');
 const captionElement = bigPicture.querySelector('.social__caption');
-const currentCommentsCountElement = bigPicture.querySelector(
-  '.social__comment-count'
-);
+// const currentCommentsCountElement = bigPicture.querySelector(
+//   '.social__comment-count'
+// );
 const allCommentsCountElement = bigPicture.querySelector('.comments-count');
-const commentsLoader = bigPicture.querySelector('.comments-loader');
+//const commentsLoader = bigPicture.querySelector('.comments-loader');
 const commentsElement = bigPicture.querySelector('.social__comments');
 const closeButton = bigPicture.querySelector('#picture-cancel');
 
@@ -37,8 +39,6 @@ const createGallery = ({ url, likes, comments, description }) => {
   likesCountElement.textContent = likes;
   allCommentsCountElement.textContent = comments.length;
   captionElement.textContent = description;
-  currentCommentsCountElement.classList.add('hidden');
-  commentsLoader.classList.add('hidden');
 
   commentsElement.innerHTML = '';
   const commentsFragment = document.createDocumentFragment();
@@ -49,24 +49,33 @@ const createGallery = ({ url, likes, comments, description }) => {
   commentsElement.append(commentsFragment);
 };
 
-const showGallery = () => {
-  bigPicture.classList.remove('hidden');
-  body.classList.add('modal-open');
-};
+const focusHandler = trapFocus(bigPicture);
 
 const closeGallery = () => {
   bigPicture.classList.add('hidden');
   body.classList.remove('modal-open');
+  bigPicture.removeEventListener('keydown', focusHandler);
+  document.removeEventListener('keydown', escapeHandler);
+};
+
+function escapeHandler(event) {
+  if (isEscapeKey(event)) {
+    event.preventDefault();
+    closeGallery();
+  }
+}
+
+const showGallery = () => {
+  bigPicture.classList.remove('hidden');
+  body.classList.add('modal-open');
+  bigPicture.addEventListener('keydown', focusHandler);
+  closeButton.focus();
+
+  document.addEventListener('keydown', escapeHandler);
 };
 
 closeButton.addEventListener('click', () => {
   closeGallery();
-});
-
-document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape') {
-    closeGallery();
-  }
 });
 
 export { createGallery, showGallery };

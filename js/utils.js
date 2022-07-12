@@ -35,4 +35,39 @@ const checkStringLength = (str, maxLength) => {
   return str.length <= maxLength;
 };
 
-export { getRandomInteger, checkStringLength };
+const isEscapeKey = (event) => event.key === 'Escape';
+const isTabKey = (event) => event.key === 'Tab';
+
+const trapFocus = (element) => {
+  const focusableElements = element.querySelectorAll(
+    'a[href]:not([disabled]), button:not([disabled]), textarea:not([disabled]), input[type="text"]:not([disabled]), input[type="radio"]:not([disabled]), input[type="checkbox"]:not([disabled]), select:not([disabled])'
+  );
+  const firstFocusableElement = focusableElements[0];
+  const lastFocusableElement = focusableElements[focusableElements.length - 1];
+
+  return (event) => {
+    if (!isTabKey(event)) {
+      return;
+    }
+
+    if (event.shiftKey) {
+      if (document.activeElement === firstFocusableElement) {
+        lastFocusableElement.focus();
+        event.preventDefault();
+      }
+    } else {
+      if (document.activeElement === lastFocusableElement) {
+        event.preventDefault();
+        firstFocusableElement.focus();
+      }
+    }
+  };
+};
+
+export {
+  getRandomInteger,
+  checkStringLength,
+  isEscapeKey,
+  isTabKey,
+  trapFocus,
+};
