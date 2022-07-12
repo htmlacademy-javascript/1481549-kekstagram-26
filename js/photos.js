@@ -1,5 +1,5 @@
 import { generatePhotos } from './data.js';
-import { createGallery, showGallery } from './gallery.js';
+import { createGallery } from './gallery.js';
 
 const picturesElement = document.querySelector('.pictures');
 const pictureTemplate = document
@@ -18,7 +18,6 @@ pictures.forEach((picture) => {
   pictureElement.querySelector('.picture__likes').textContent = likes;
   pictureElement.addEventListener('click', () => {
     createGallery(picture);
-    showGallery();
   });
   picturesFragment.appendChild(pictureElement);
 });
