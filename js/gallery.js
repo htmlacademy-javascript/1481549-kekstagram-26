@@ -1,15 +1,14 @@
-import { isEscapeKey, isTabKey, trapFocus } from './utils.js';
+import { isEscapeKey, trapFocus } from './utils.js';
 
 const body = document.body;
 const bigPicture = document.querySelector('.big-picture');
 const imageElement = bigPicture.querySelector('.big-picture__img img');
 const likesCountElement = bigPicture.querySelector('.likes-count');
 const captionElement = bigPicture.querySelector('.social__caption');
-// const currentCommentsCountElement = bigPicture.querySelector(
-//   '.social__comment-count'
-// );
 const allCommentsCountElement = bigPicture.querySelector('.comments-count');
-//const commentsLoader = bigPicture.querySelector('.comments-loader');
+const currentCommentsCountElement =
+  bigPicture.querySelector('.comments-current');
+const commentsLoader = bigPicture.querySelector('.comments-loader');
 const commentsElement = bigPicture.querySelector('.social__comments');
 const closeButton = bigPicture.querySelector('#picture-cancel');
 
@@ -34,12 +33,7 @@ const createCommentElement = ({ avatar, name, message }) => {
   return commentElement;
 };
 
-const createGallery = ({ url, likes, comments, description }) => {
-  imageElement.src = url;
-  likesCountElement.textContent = likes;
-  allCommentsCountElement.textContent = comments.length;
-  captionElement.textContent = description;
-
+const createComments = (comments) => {
   commentsElement.innerHTML = '';
   const commentsFragment = document.createDocumentFragment();
   comments.forEach((comment) => {
@@ -49,33 +43,65 @@ const createGallery = ({ url, likes, comments, description }) => {
   commentsElement.append(commentsFragment);
 };
 
-const focusHandler = trapFocus(bigPicture);
+const createGallery = ({ url, likes, comments, description }) => {
+  imageElement.src = url;
+  likesCountElement.textContent = likes;
+  allCommentsCountElement.textContent = comments.length;
+  captionElement.textContent = description;
 
-const closeGallery = () => {
-  bigPicture.classList.add('hidden');
-  body.classList.remove('modal-open');
-  bigPicture.removeEventListener('keydown', focusHandler);
-  document.removeEventListener('keydown', escapeHandler);
-};
-
-function escapeHandler(event) {
-  if (isEscapeKey(event)) {
-    event.preventDefault();
-    closeGallery();
+  let currentCommentCount = Math.min(5, comments.length);
+  let currentComments = comments.slice(0, currentCommentCount);
+  currentCommentsCountElement.textContent = currentCommentCount;
+  if (currentCommentCount === comments.length) {
+    commentsLoader.classList.add('hidden');
   }
-}
 
-const showGallery = () => {
-  bigPicture.classList.remove('hidden');
-  body.classList.add('modal-open');
-  bigPicture.addEventListener('keydown', focusHandler);
-  closeButton.focus();
+  const loadComments = () => {
+    currentCommentCount += Math.min(5, comments.length - currentCommentCount);
+    currentComments = comments.slice(0, currentCommentCount);
+    currentCommentsCountElement.textContent = currentCommentCount;
+    if (currentCommentCount === comments.length) {
+      commentsLoader.classList.add('hidden');
+    }
+    createComments(currentComments);
+  };
 
-  document.addEventListener('keydown', escapeHandler);
+  commentsLoader.addEventListener('click', loadComments);
+
+  createComments(currentComments);
+
+  const focusHandler = trapFocus(bigPicture);
+
+  const closeGallery = () => {
+    bigPicture.classList.add('hidden');
+    body.classList.remove('modal-open');
+    bigPicture.removeEventListener('keydown', focusHandler);
+    document.removeEventListener('keydown', escapeHandler);
+    commentsLoader.removeEventListener('click', loadComments);
+    commentsLoader.classList.remove('hidden');
+  };
+
+  function escapeHandler(event) {
+    if (isEscapeKey(event)) {
+      event.preventDefault();
+      closeGallery();
+    }
+  }
+
+  const showGallery = () => {
+    bigPicture.classList.remove('hidden');
+    body.classList.add('modal-open');
+    bigPicture.addEventListener('keydown', focusHandler);
+    closeButton.focus();
+
+    document.addEventListener('keydown', escapeHandler);
+  };
+
+  closeButton.addEventListener('click', () => {
+    closeGallery();
+  });
+
+  showGallery();
 };
 
-closeButton.addEventListener('click', () => {
-  closeGallery();
-});
-
-export { createGallery, showGallery };
+export { createGallery };
