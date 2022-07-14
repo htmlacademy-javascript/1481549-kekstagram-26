@@ -1,5 +1,6 @@
 import { isEscapeKey, trapFocus } from './utils.js';
 import { validate } from './validation.js';
+import { initImageEditor, resetImageEditor } from './filters.js';
 
 const body = document.body;
 const form = document.querySelector('#upload-select-image');
@@ -29,17 +30,20 @@ successElement.classList.add('visually-hidden');
 form.appendChild(errorElement);
 form.appendChild(successElement);
 
-const showErrorModal = (message) => {
-  errorTitleElement.textContent = message;
+const showErrorModal = () => {
+  errorContinueButton.focus();
   errorElement.classList.remove('visually-hidden');
   photoEditOverlay.removeEventListener('keydown', focusHandler);
   errorElement.addEventListener('keydown', errorFocusHandler);
+  document.removeEventListener('keydown', escapeHandler);
 };
 
 const showSuccessModal = () => {
+  successContinueButton.focus();
+  document.removeEventListener('keydown', escapeHandler);
   photoEditOverlay.removeEventListener('keydown', focusHandler);
   successElement.classList.remove('visually-hidden');
-  successElement.addEventListener('keydown', successElement);
+  successElement.addEventListener('keydown', succsessFocusHandler);
 };
 
 const closePhotoEditOverlay = () => {
@@ -53,6 +57,7 @@ const closePhotoEditOverlay = () => {
   document.removeEventListener('keydown', escapeHandler);
   photoEditOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
+  resetImageEditor();
 };
 
 function escapeHandler(event) {
@@ -67,7 +72,7 @@ const showImageEditor = () => {
   body.classList.add('modal-open');
   photoEditOverlay.addEventListener('keydown', focusHandler);
   closeButton.focus();
-
+  initImageEditor();
   document.addEventListener('keydown', escapeHandler);
 };
 
@@ -101,6 +106,7 @@ errorContinueButton.addEventListener('click', () => {
   closeButton.focus(); // почему то фокус теряется при закрытии модалки
   photoEditOverlay.addEventListener('keydown', focusHandler);
   errorElement.removeEventListener('keydown', errorFocusHandler);
+  document.addEventListener('keydown', escapeHandler);
 });
 
 successContinueButton.addEventListener('click', () => {
@@ -108,13 +114,14 @@ successContinueButton.addEventListener('click', () => {
   closeButton.focus();
   photoEditOverlay.addEventListener('keydown', focusHandler);
   successElement.removeEventListener('keydown', succsessFocusHandler);
+  document.addEventListener('keydown', escapeHandler);
 });
 
 form.addEventListener('submit', (event) => {
   event.preventDefault();
-  const [isValid, errors] = validate();
+  const [isValid] = validate();
   if (!isValid) {
-    showErrorModal(errors);
+    showErrorModal();
   } else {
     showSuccessModal();
   }
