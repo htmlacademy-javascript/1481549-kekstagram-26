@@ -3,6 +3,7 @@ const smallerButton = document.querySelector('.scale__control--smaller');
 const biggerButton = document.querySelector('.scale__control--bigger');
 const scaleInput = document.querySelector('.scale__control--value');
 const filterButtons = [...document.querySelectorAll('input[name="effect"]')];
+const sliderElement = document.querySelector('.effect-level__slider');
 
 const EFFECTS = {
   NONE: 'none',
@@ -18,6 +19,36 @@ const MIN_SCALE = 0.25;
 const MAX_SCALE = 1;
 
 let currentScale = 1;
+
+noUiSlider.create(sliderElement, {
+  range: {
+    min: 0,
+    max: 100,
+  },
+  start: 80,
+  step: 1,
+  connect: 'lower',
+});
+
+const updateSlider = (min, max, start, step, cb) => {
+  sliderElement.classList.remove('visually-hidden');
+  sliderElement.noUiSlider.updateOptions({
+    range: {
+      min: min,
+      max: max,
+    },
+    start: start,
+    step: step,
+  });
+  sliderElement.noUiSlider.off('update');
+  sliderElement.noUiSlider.on('update', cb);
+};
+
+const disableSlider = () => {
+  sliderElement.classList.add('visually-hidden');
+  sliderElement.noUiSlider.off('update');
+  image.style.filter = 'none';
+};
 
 const scale = (value) => `scale(${value})`;
 const grayscale = (value) => `grayscale(${value})`;
@@ -68,22 +99,37 @@ filterButtons.forEach((filterButton) => {
   filterButton.addEventListener('click', (event) => {
     switch (event.target.value) {
       case EFFECTS.NONE:
-        image.style.filter = 'none';
+        disableSlider();
         break;
       case EFFECTS.CHROME:
-        image.style.filter = grayscale(1);
+        // 0..1, 0.1
+        updateSlider(0, 1, 1, 0.1, (value) => {
+          image.style.filter = grayscale(value);
+        });
         break;
       case EFFECTS.SEPIA:
-        image.style.filter = sepia(1);
+        // 0..1, 0.1
+        updateSlider(0, 1, 1, 0.1, (value) => {
+          image.style.filter = sepia(value);
+        });
         break;
       case EFFECTS.MARVIN:
-        image.style.filter = invert(100);
+        // 0..100%, 1%
+        updateSlider(0, 100, 100, 1, (value) => {
+          image.style.filter = invert(value);
+        });
         break;
       case EFFECTS.PHOBOS:
-        image.style.filter = blur(2.5);
+        // 0..3px, 0.1px
+        updateSlider(0, 3, 3, 0.1, (value) => {
+          image.style.filter = blur(value);
+        });
         break;
       case EFFECTS.HEAT:
-        image.style.filter = brightness(3);
+        // 1..3, 0.1
+        updateSlider(1, 3, 3, 0.1, (value) => {
+          image.style.filter = brightness(value);
+        });
         break;
       default:
         break;
