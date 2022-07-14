@@ -42,8 +42,6 @@ const setScaleHandler = () => {
   restrictedPercent = restrictedPercent > 100 ? 100 : restrictedPercent;
   restrictedPercent = restrictedPercent < 0 ? 0 : restrictedPercent;
 
-  scaleInput.value = `${restrictedPercent}%`;
-
   let value = restrictedPercent / 100;
   value = value > MAX_SCALE ? MAX_SCALE : value;
   value = value < MIN_SCALE ? MIN_SCALE : value;
