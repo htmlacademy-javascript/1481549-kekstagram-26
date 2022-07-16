@@ -118,11 +118,11 @@ successContinueButton.addEventListener('click', () => {
 });
 
 form.addEventListener('submit', (event) => {
-  event.preventDefault();
-  const [isValid] = validate();
-  if (!isValid) {
-    showErrorModal();
-  } else {
-    showSuccessModal();
-  }
+  // event.preventDefault();
+  // const [isValid] = validate();
+  // if (!isValid) {
+  //   showErrorModal();
+  // } else {
+  //   showSuccessModal();
+  // }
 });

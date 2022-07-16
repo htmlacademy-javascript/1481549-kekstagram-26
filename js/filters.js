@@ -4,6 +4,7 @@ const biggerButton = document.querySelector('.scale__control--bigger');
 const scaleInput = document.querySelector('.scale__control--value');
 const filterButtons = [...document.querySelectorAll('input[name="effect"]')];
 const sliderElement = document.querySelector('.effect-level__slider');
+const effectLevelElement = document.querySelector('.effect-level__value');
 
 const EFFECTS = {
   NONE: 'none',
@@ -48,6 +49,7 @@ const disableSlider = () => {
   sliderElement.classList.add('visually-hidden');
   sliderElement.noUiSlider.off('update');
   image.style.filter = 'none';
+  effectLevelElement.value = '';
 };
 
 const scale = (value) => `scale(${value})`;
@@ -105,30 +107,35 @@ filterButtons.forEach((filterButton) => {
         // 0..1, 0.1
         updateSlider(0, 1, 1, 0.1, (value) => {
           image.style.filter = grayscale(value);
+          effectLevelElement.value = value;
         });
         break;
       case EFFECTS.SEPIA:
         // 0..1, 0.1
         updateSlider(0, 1, 1, 0.1, (value) => {
           image.style.filter = sepia(value);
+          effectLevelElement.value = value;
         });
         break;
       case EFFECTS.MARVIN:
         // 0..100%, 1%
         updateSlider(0, 100, 100, 1, (value) => {
           image.style.filter = invert(value);
+          effectLevelElement.value = value;
         });
         break;
       case EFFECTS.PHOBOS:
         // 0..3px, 0.1px
         updateSlider(0, 3, 3, 0.1, (value) => {
           image.style.filter = blur(value);
+          effectLevelElement.value = value;
         });
         break;
       case EFFECTS.HEAT:
         // 1..3, 0.1
         updateSlider(1, 3, 3, 0.1, (value) => {
           image.style.filter = brightness(value);
+          effectLevelElement.value = value;
         });
         break;
       default:
@@ -140,11 +147,15 @@ filterButtons.forEach((filterButton) => {
 const initImageEditor = () => {
   currentScale = 1;
   image.style.transform = scale(1);
+  image.style.filter = 'none';
+  disableSlider();
 };
 
 const resetImageEditor = () => {
+  currentScale = 1;
   image.style.transform = scale(1);
   image.style.filter = 'none';
+  disableSlider();
 };
 
 biggerButton.addEventListener('click', increaseScaleHandler);
