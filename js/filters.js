@@ -148,6 +148,7 @@ const initImageEditor = () => {
   currentScale = 1;
   image.style.transform = scale(1);
   image.style.filter = 'none';
+  filterButtons[0].checked = true;
   disableSlider();
 };
 
@@ -155,6 +156,7 @@ const resetImageEditor = () => {
   currentScale = 1;
   image.style.transform = scale(1);
   image.style.filter = 'none';
+  filterButtons[0].checked = true;
   disableSlider();
 };
 

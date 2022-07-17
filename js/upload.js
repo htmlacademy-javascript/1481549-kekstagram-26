@@ -1,6 +1,7 @@
 import { isEscapeKey, trapFocus } from './utils.js';
 import { validate, resetValidation } from './validation.js';
 import { initImageEditor, resetImageEditor } from './filters.js';
+import { uploadPhoto } from './fetch.js';
 
 const body = document.body;
 const form = document.querySelector('#upload-select-image');
@@ -112,18 +113,19 @@ errorContinueButton.addEventListener('click', () => {
 
 successContinueButton.addEventListener('click', () => {
   successElement.classList.add('visually-hidden');
-  closeButton.focus();
-  photoEditOverlay.addEventListener('keydown', focusHandler);
-  successElement.removeEventListener('keydown', succsessFocusHandler);
-  document.addEventListener('keydown', escapeHandler);
+  closePhotoEditOverlay();
+  // closeButton.focus();
+  // photoEditOverlay.addEventListener('keydown', focusHandler);
+  // successElement.removeEventListener('keydown', succsessFocusHandler);
+  // document.addEventListener('keydown', escapeHandler);
 });
 
 form.addEventListener('submit', (event) => {
-  // event.preventDefault();
-  // const [isValid] = validate();
-  // if (!isValid) {
-  //   showErrorModal();
-  // } else {
-  //   showSuccessModal();
-  // }
+  event.preventDefault();
+  const [isValid] = validate();
+  if (!isValid) {
+    showErrorModal();
+  } else {
+    uploadPhoto(form, showSuccessModal, showErrorModal);
+  }
 });
