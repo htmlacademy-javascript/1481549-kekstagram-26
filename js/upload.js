@@ -1,5 +1,5 @@
 import { isEscapeKey, trapFocus } from './utils.js';
-import { validate } from './validation.js';
+import { validate, resetValidation } from './validation.js';
 import { initImageEditor, resetImageEditor } from './filters.js';
 
 const body = document.body;
@@ -58,6 +58,7 @@ const closePhotoEditOverlay = () => {
   photoEditOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
   resetImageEditor();
+  resetValidation();
 };
 
 function escapeHandler(event) {
