@@ -82,4 +82,8 @@ const validate = () => {
   }
 };
 
-export { validate };
+const resetValidation = () => {
+  pristine.reset();
+};
+
+export { validate, resetValidation };
