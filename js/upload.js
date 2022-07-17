@@ -31,22 +31,6 @@ successElement.classList.add('visually-hidden');
 form.appendChild(errorElement);
 form.appendChild(successElement);
 
-const showErrorModal = () => {
-  errorContinueButton.focus();
-  errorElement.classList.remove('visually-hidden');
-  photoEditOverlay.removeEventListener('keydown', focusHandler);
-  errorElement.addEventListener('keydown', errorFocusHandler);
-  document.removeEventListener('keydown', escapeHandler);
-};
-
-const showSuccessModal = () => {
-  successContinueButton.focus();
-  document.removeEventListener('keydown', escapeHandler);
-  photoEditOverlay.removeEventListener('keydown', focusHandler);
-  successElement.classList.remove('visually-hidden');
-  successElement.addEventListener('keydown', succsessFocusHandler);
-};
-
 const closePhotoEditOverlay = () => {
   errorTitleElement.innerHtml = '';
   hashTagInput.value = '';
@@ -55,19 +39,77 @@ const closePhotoEditOverlay = () => {
   photoEditOverlay.removeEventListener('keydown', focusHandler);
   errorElement.removeEventListener('keydown', errorFocusHandler);
   successElement.removeEventListener('keydown', successElement);
-  document.removeEventListener('keydown', escapeHandler);
+  document.removeEventListener('keydown', photoEditEscapeHandler);
   photoEditOverlay.classList.add('hidden');
   body.classList.remove('modal-open');
   resetImageEditor();
   resetValidation();
 };
 
-function escapeHandler(event) {
+function closeSuccessModal() {
+  successElement.classList.add('visually-hidden');
+  document.removeEventListener('click', modalHandler);
+  document.addEventListener('keydown', photoEditEscapeHandler);
+  document.removeEventListener('keydown', modalSuccessEscapeHandler);
+}
+
+function closeErrorModal() {
+  errorElement.classList.add('visually-hidden');
+  document.removeEventListener('click', modalHandler);
+  document.addEventListener('keydown', photoEditEscapeHandler);
+  document.removeEventListener('keydown', modalErrorEscapeHandler);
+}
+
+function modalHandler(event) {
+  if (event.target.classList.contains('success')) {
+    closeSuccessModal();
+    closePhotoEditOverlay();
+  } else if (event.target.classList.contains('error')) {
+    closeErrorModal();
+  }
+}
+
+function photoEditEscapeHandler(event) {
   if (isEscapeKey(event)) {
     event.preventDefault();
     closePhotoEditOverlay();
   }
 }
+
+function modalSuccessEscapeHandler(event) {
+  if (isEscapeKey(event)) {
+    event.preventDefault();
+    closeSuccessModal();
+    closePhotoEditOverlay();
+  }
+}
+
+function modalErrorEscapeHandler(event) {
+  if (isEscapeKey(event)) {
+    event.preventDefault();
+    closeErrorModal();
+  }
+}
+
+const showErrorModal = () => {
+  errorContinueButton.focus();
+  errorElement.classList.remove('visually-hidden');
+  photoEditOverlay.removeEventListener('keydown', focusHandler);
+  errorElement.addEventListener('keydown', errorFocusHandler);
+  document.addEventListener('click', modalHandler);
+  document.removeEventListener('keydown', photoEditEscapeHandler);
+  document.addEventListener('keydown', modalErrorEscapeHandler);
+};
+
+const showSuccessModal = () => {
+  successContinueButton.focus();
+  photoEditOverlay.removeEventListener('keydown', focusHandler);
+  successElement.classList.remove('visually-hidden');
+  successElement.addEventListener('keydown', succsessFocusHandler);
+  document.addEventListener('click', modalHandler);
+  document.removeEventListener('keydown', photoEditEscapeHandler);
+  document.addEventListener('keydown', modalSuccessEscapeHandler);
+};
 
 const showImageEditor = () => {
   photoEditOverlay.classList.remove('hidden');
@@ -75,7 +117,7 @@ const showImageEditor = () => {
   photoEditOverlay.addEventListener('keydown', focusHandler);
   closeButton.focus();
   initImageEditor();
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', photoEditEscapeHandler);
 };
 
 fileInput.addEventListener('change', () => {
@@ -88,19 +130,19 @@ closeButton.addEventListener('click', () => {
 });
 
 commentInput.addEventListener('focus', () => {
-  document.removeEventListener('keydown', escapeHandler);
+  document.removeEventListener('keydown', photoEditEscapeHandler);
 });
 
 commentInput.addEventListener('blur', () => {
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', photoEditEscapeHandler);
 });
 
 hashTagInput.addEventListener('focus', () => {
-  document.removeEventListener('keydown', escapeHandler);
+  document.removeEventListener('keydown', photoEditEscapeHandler);
 });
 
 hashTagInput.addEventListener('blur', () => {
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', photoEditEscapeHandler);
 });
 
 errorContinueButton.addEventListener('click', () => {
@@ -108,16 +150,12 @@ errorContinueButton.addEventListener('click', () => {
   closeButton.focus(); // почему то фокус теряется при закрытии модалки
   photoEditOverlay.addEventListener('keydown', focusHandler);
   errorElement.removeEventListener('keydown', errorFocusHandler);
-  document.addEventListener('keydown', escapeHandler);
+  document.addEventListener('keydown', photoEditEscapeHandler);
 });
 
 successContinueButton.addEventListener('click', () => {
-  successElement.classList.add('visually-hidden');
+  closeSuccessModal();
   closePhotoEditOverlay();
-  // closeButton.focus();
-  // photoEditOverlay.addEventListener('keydown', focusHandler);
-  // successElement.removeEventListener('keydown', succsessFocusHandler);
-  // document.addEventListener('keydown', escapeHandler);
 });
 
 form.addEventListener('submit', (event) => {
