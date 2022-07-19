@@ -3,9 +3,12 @@ import { validate, resetValidation } from './validation.js';
 import { initImageEditor, resetImageEditor } from './filters.js';
 import { uploadPhoto } from './fetch.js';
 
+const FILE_TYPES = ['gif', 'jpg', 'jpeg', 'png'];
+
 const body = document.body;
 const form = document.querySelector('#upload-select-image');
 const fileInput = document.querySelector('#upload-file');
+const previewElement = document.querySelector('.img-upload__preview img');
 const photoEditOverlay = document.querySelector('.img-upload__overlay');
 const closeButton = photoEditOverlay.querySelector('.img-upload__cancel');
 const hashTagInput = photoEditOverlay.querySelector('.text__hashtags');
@@ -112,18 +115,24 @@ const showSuccessModal = () => {
   document.addEventListener('keydown', modalSuccessEscapeHandler);
 };
 
-const showImageEditor = () => {
+const showImageEditor = (file) => {
   photoEditOverlay.classList.remove('hidden');
   body.classList.add('modal-open');
   photoEditOverlay.addEventListener('keydown', focusHandler);
   closeButton.focus();
   initImageEditor();
   document.addEventListener('keydown', photoEditEscapeHandler);
+
+  const fileName = file.name.toLowerCase();
+  const matches = FILE_TYPES.some((type) => fileName.endsWith(type));
+  if (matches) {
+    previewElement.src = URL.createObjectURL(file);
+  }
 };
 
 fileInput.addEventListener('change', () => {
-  //fileInput.value = null;
-  showImageEditor();
+  const [file] = fileInput.files;
+  showImageEditor(file);
 });
 
 closeButton.addEventListener('click', () => {
