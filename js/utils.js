@@ -64,10 +64,19 @@ const trapFocus = (element) => {
   };
 };
 
+const debounce = (cb, delay) => {
+  let timerId;
+  return (...rest) => {
+    clearTimeout(timerId);
+    setTimeout(() => cb(...rest), delay);
+  };
+};
+
 export {
   getRandomInteger,
   checkStringLength,
   isEscapeKey,
   isTabKey,
   trapFocus,
+  debounce,
 };
