@@ -1,10 +1,11 @@
 import { loadPhotos } from './fetch.js';
 import { createGallery } from './gallery.js';
-import { getRandomInteger } from './utils.js';
+import { getRandomInteger, debounce } from './utils.js';
 import './fetch.js';
 
 const ERROR_TIMEOUT = 2000;
 const PHOTOS_RANDOM_COUNT = 10;
+const DEBOUNCE_DELAY = 500;
 
 const picturesElement = document.querySelector('.pictures');
 const filtersElement = document.querySelector('.img-filters');
@@ -92,26 +93,34 @@ const createRandomElementGenerator = (arr) => {
 
 const setupFilters = (photos) => {
   filtersElement.classList.remove('img-filters--inactive');
+
+  const defaultPhotosHandler = debounce(() => {
+    renderPictures(photos);
+  }, DEBOUNCE_DELAY);
+
+  const randomPhotosHandler = debounce(() => {
+    const generator = createRandomElementGenerator(photos);
+    const randomPhotos = Array.from({ length: PHOTOS_RANDOM_COUNT }, generator);
+    renderPictures(randomPhotos);
+  }, DEBOUNCE_DELAY);
+
+  const sortedPhotosHandler = debounce(() => {
+    const sortedPhotos = [...photos];
+    sortedPhotos.sort((a, b) => b.comments.length - a.comments.length);
+    renderPictures(sortedPhotos);
+  }, DEBOUNCE_DELAY);
+
   defaultFilterElement.addEventListener('click', () => {
     toggleFilterButton(defaultFilterElement);
-
-    renderPictures(photos);
+    defaultPhotosHandler();
   });
   randomFilterElement.addEventListener('click', () => {
     toggleFilterButton(randomFilterElement);
-
-    const generator = createRandomElementGenerator(photos);
-    const randomPhotos = Array.from({ length: PHOTOS_RANDOM_COUNT }, generator);
-
-    renderPictures(randomPhotos);
+    randomPhotosHandler();
   });
   popularFilterElement.addEventListener('click', () => {
     toggleFilterButton(popularFilterElement);
-
-    const sortedPhotos = [...photos];
-    sortedPhotos.sort((a, b) => b.comments.length - a.comments.length);
-
-    renderPictures(sortedPhotos);
+    sortedPhotosHandler();
   });
 };
 

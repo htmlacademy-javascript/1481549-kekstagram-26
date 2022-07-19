@@ -64,11 +64,11 @@ const trapFocus = (element) => {
   };
 };
 
-const debounce = (cb, delay) => {
-  let timerId;
+const debounce = (callback, timeoutDelay = 500) => {
+  let timeoutId;
   return (...rest) => {
-    clearTimeout(timerId);
-    setTimeout(() => cb(...rest), delay);
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => callback.apply(this, rest), timeoutDelay);
   };
 };
 
