@@ -21,6 +21,7 @@ const successElement = document
 const errorContinueButton = errorElement.querySelector('.error__button');
 const successContinueButton = successElement.querySelector('.success__button');
 const errorTitleElement = errorElement.querySelector('.error__title');
+const submitButton = form.querySelector('.img-upload__submit');
 
 const focusHandler = trapFocus(photoEditOverlay);
 const errorFocusHandler = trapFocus(errorElement);
@@ -164,6 +165,17 @@ form.addEventListener('submit', (event) => {
   if (!isValid) {
     showErrorModal();
   } else {
-    uploadPhoto(form, showSuccessModal, showErrorModal);
+    submitButton.disabled = true;
+    uploadPhoto(
+      form,
+      () => {
+        showSuccessModal();
+        submitButton.disabled = false;
+      },
+      () => {
+        showErrorModal();
+        submitButton.disabled = false;
+      }
+    );
   }
 });
